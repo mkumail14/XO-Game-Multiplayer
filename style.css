@@ -6,21 +6,29 @@ body {
     flex-direction: column;
 }
 
+.logo img {
+    width: 90px;
+    height: auto;
+}
+
 .navbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1rem;
     background-color: #333;
     color: #fff;
     border-bottom: 5px #3d3dea solid;
 }
 
-.logo img {
-    width: 50px;
-    height: auto;
-}
+footer{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #333;
+    color: #fff;
+    border-top: 2px #3d3dea solid;
 
+}
 .nav-links a {
     color: #fff;
     text-decoration: none;
@@ -57,10 +65,9 @@ main {
     display: flex;
     flex-direction: column;
     border: 2px #3d3dea solid;
-    width: 80%;
+    width: fit-content;
     max-width: 500px;
     background-color: #fff;
-    padding: 20px;
 }
 
 button {

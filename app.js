@@ -19,16 +19,18 @@ document.getElementById('gameContainer').style.display='none'
 document.getElementById('inputGameId').style.display='none'
 document.getElementById('submitGameIdBtn').style.display='none'
 document.getElementById('backBtn').style.display='none'
+document.getElementById('replayBtn').style.display='none'
+document.getElementById('homeBtn').style.display='none'
 document.getElementById('gamePanel').classList.add('disabled')
 
 localStorage.removeItem('gameID')
 localStorage.removeItem('icon')
-
+let Stop=false;
 
   async function createGame(){
     let turn;
     let tempValue=Math.random()*100;
-    if(tempValue%2==0){
+    if(tempValue>50){
     turn="X"
     }else{
     turn="O"
@@ -45,9 +47,9 @@ const docRef = await addDoc(collection(db, "currentGame"), {
     cell8:null,
     status:"Disconnected",
     turn:`${turn}`,
-    winner:null
+    winner:null,
   });
-  console.log("Document written with ID: ", docRef.id);
+  navigator.clipboard.writeText(docRef.id);
   localStorage.setItem('gameID',docRef.id)
   localStorage.setItem('icon',"X")
   document.getElementById('gameContainer').style.display='flex'
@@ -59,7 +61,26 @@ const docRef = await addDoc(collection(db, "currentGame"), {
     const docSnap = await getDoc(docRef);
     
     if (docSnap.exists()) {
-      console.log("Document data:", docSnap.data());
+      if(docSnap.data().winner==null){
+        checkWin()
+      }else{
+        Stop=true;
+        if(docSnap.data().winner==localStorage.getItem('icon')){
+        await Swal.fire({
+            title: "Congratulation!",
+            text: "You Won!",
+            icon: "success"
+          });
+        }else{
+           await Swal.fire({
+                title: "You Lost!",
+                text: "Better Luck Next Time...",
+                icon: "error"
+              });
+        }
+          document.getElementById('replayBtn').style.display='inline'
+          document.getElementById('homeBtn').style.display='inline'
+      }
 
       if(docSnap.data().status=='connected'){
     document.getElementById('status').innerText="Connected"
@@ -112,10 +133,15 @@ const docRef = await addDoc(collection(db, "currentGame"), {
         document.getElementById('8').classList.add('disabled');
       }
       if(docSnap.data().status=="connected" && docSnap.data().turn==localStorage.getItem('icon') ){
+        document.getElementById('turn').innerText="Your";
+        document.getElementById('turn').style.color='green'
         document.getElementById('gamePanel').classList.remove('disabled')
       }else{
+        document.getElementById('turn').innerText="Opponent";
+        document.getElementById('turn').style.color='red'
         document.getElementById('gamePanel').classList.add('disabled')
       }
+      
     } else {
         Swal.fire({
             title: "No Game Found!",
@@ -126,7 +152,7 @@ const docRef = await addDoc(collection(db, "currentGame"), {
   }
  
     setInterval(function () {
-        if(localStorage.getItem('gameID')){
+        if(localStorage.getItem('gameID') && Stop==false){
         loadData()}
       }, 1000);
  
@@ -190,8 +216,72 @@ function backBtn(){
     document.getElementById('submitGameIdBtn').style.display='none'
     document.getElementById('backBtn').style.display='none'
 }
+
+
+async function checkWin(){
+    const docRef = doc(db, "currentGame", localStorage.getItem('gameID'));
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      if(docSnap.data().cell0!=null && docSnap.data().cell0==docSnap.data().cell1 && docSnap.data().cell1==docSnap.data().cell2){
+        setWinner(docSnap.data().cell0)
+      }else if(docSnap.data().cell3!=null && docSnap.data().cell3==docSnap.data().cell4 && docSnap.data().cell4==docSnap.data().cell5){
+        setWinner(docSnap.data().cell3)
+      }else if(docSnap.data().cell6!=null && docSnap.data().cell6==docSnap.data().cell7 && docSnap.data().cell7==docSnap.data().cell8){
+        setWinner(docSnap.data().cell6)
+      }else if(docSnap.data().cell0!=null && docSnap.data().cell0==docSnap.data().cell3 && docSnap.data().cell3==docSnap.data().cell6){
+        setWinner(docSnap.data().cell0)
+      }else if(docSnap.data().cell2!=null && docSnap.data().cell2==docSnap.data().cell5 && docSnap.data().cell5==docSnap.data().cell8){
+        setWinner(docSnap.data().cell2)
+      }else if(docSnap.data().cell0!=null && docSnap.data().cell0==docSnap.data().cell4 && docSnap.data().cell4==docSnap.data().cell8){
+        setWinner(docSnap.data().cell0)
+      }else if(docSnap.data().cell2!=null && docSnap.data().cell2==docSnap.data().cell4 && docSnap.data().cell4==docSnap.data().cell6){
+        setWinner(docSnap.data().cell2)
+      }else if(docSnap.data().cell1!=null && docSnap.data().cell1==docSnap.data().cell4 && docSnap.data().cell4==docSnap.data().cell7){
+        setWinner(docSnap.data().cell1)
+      }
+
+    }
+}
+
+function gotoHome(){
+    localStorage.clear;
+    window.location.href="index.html"
+}
+
+// async function replay(){
+//     const temp = doc(db, "currentGame", localStorage.getItem('gameID'));
+//     let turn;
+//     let tempValue=Math.random()*100;
+//     if(tempValue>50){
+//     turn="X"
+//     }else{
+//     turn="O"
+//     }
+//     await updateDoc(temp, {
+//         cell0:null,
+//         cell1:null,
+//         cell2:null,
+//         cell3:null,
+//         cell4:null,
+//         cell5:null,
+//         cell6:null,
+//         cell7:null,
+//         cell8:null,
+//         status:"Disconnected",
+//         turn:`${turn}`,
+//         winner:null
+//       });
+// }
+
+async function setWinner(winner){
+    const temp = doc(db, "currentGame", localStorage.getItem('gameID'));
+    await updateDoc(temp, {
+        winner:winner
+      });
+}
   window.createGame=createGame;
   window.choose=choose;
   window.joinGame=joinGame;
   window.submitGameId=submitGameId;
-  window.backBtn=backBtn
+  window.backBtn=backBtn;
+  window.gotoHome=gotoHome;
