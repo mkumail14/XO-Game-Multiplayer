@@ -20,13 +20,18 @@
     </nav>
     <main>
         <div id="btnContainer">
-            <button onclick="joinGame()">Join Game</button>
-            <button onclick="createGame()">Create Game</button>
+            <button id="joinGameBtn" onclick="joinGame()">Join Game</button>
+            <button id="createGameBtn" onclick="createGame()">Create Game</button>
+            <input id="inputGameId" type="text">
+            <button id="submitGameIdBtn" onclick="submitGameId()">Join Game</button>
+            <button id="backBtn" onclick="backBtn()">Back</button>
+
         </div>
         <div id="gameContainer">
             <div style="display: flex; border-bottom: 2px #3d3dea solid; background-color: beige; border-radius: 10px;">
                 <h5>Score:</h5>
                 <h5>Turn:</h5>
+                <h5>Status:<p id="status" style="color: greenyellow;"></p></h5>
             </div>
             <div id="gamePanel">
                 <div id="box">
@@ -50,6 +55,7 @@
         </div>
     </main>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-    <script src="app.js"></script>
+    <script type="module" src="app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>
 </html>
