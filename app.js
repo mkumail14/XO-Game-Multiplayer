@@ -1,8 +1,8 @@
 
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-  import { getFirestore,collection, addDoc,doc, getDoc ,updateDoc ,deleteDoc} from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+  import { getFirestore,collection, addDoc,doc, getDoc ,updateDoc ,deleteDoc, setDoc} from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 
-  const firebaseConfig = {
+  const firebaseConfig1 = {
     apiKey: "AIzaSyDdPmw7EHBU-AwoDQ1szeW7WtHANaF30Q0",
     authDomain: "xo-game-c2506.firebaseapp.com",
     projectId: "xo-game-c2506",
@@ -12,21 +12,19 @@
     measurementId: "G-701HCZH6H9"
   };
 
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-
+  const app1 = initializeApp(firebaseConfig1,"app1");
+  const db = getFirestore(app1);
 document.getElementById('gameContainer').style.display='none'
 document.getElementById('inputGameId').style.display='none'
 document.getElementById('submitGameIdBtn').style.display='none'
 document.getElementById('backBtn').style.display='none'
 document.getElementById('replayBtn').style.display='none'
 document.getElementById('homeBtn').style.display='none'
+document.getElementById('ScoreBoard').style.display='none'
 document.getElementById('gamePanel').classList.add('disabled')
-
 localStorage.removeItem('gameID')
 localStorage.removeItem('icon')
 let Stop=false;
-
   async function createGame(){
     let turn;
     let tempValue=Math.random()*100;
@@ -324,6 +322,29 @@ async function setWinner(winner){
     await updateDoc(temp, {
         winner:winner
       });
+      let score=0;
+      let email=localStorage.getItem("email").split('')
+      let username=[];
+      console.log(email)
+      for(let i=0;i<100;i++){
+        if(email[i]=='@'){
+          i=101;
+        }else{
+      username.push(email[i])
+        }
+      }
+      username=username.join('')
+      const docRef = doc(db, "scoreboard","scoreboard" );
+      const docSnap = await getDoc(docRef);
+      score=docSnap.data()[username]
+      console.log(username)
+      console.log(score)
+      score+=5
+      
+      const temp1 = doc(db, "scoreboard","scoreboard");
+      await updateDoc(temp1, {
+        abc:score
+      });
 }
 
 
@@ -348,6 +369,49 @@ function isTableFull(){
   return true;
 }
 
+
+function openScoreBoard(){
+document.getElementById('main').style.display='none'
+document.getElementById('ScoreBoard').style.display='flex'
+loadStockBoard()
+}
+
+async function loadStockBoard() {
+  const docRef = doc(db, "scoreboard", "scoreboard");
+  const docSnap = await getDoc(docRef);
+  document.getElementById('scoreboard-table').innerHTML = '';
+
+  if (docSnap.exists()) {
+    const data = docSnap.data();
+    const entries = Object.entries(data); // Convert to array of [name, score] pairs
+
+    // Sort the array based on the scores in descending order
+    entries.sort((a, b) => b[1] - a[1]);
+
+    // Create the header
+    let header = `
+      <tr>
+        <td>Position</td>
+        <td>Name</td>
+        <td>Score</td>
+      </tr>`;
+    document.getElementById('scoreboard-table').innerHTML += header;
+
+    // Create rows from the sorted array
+    for (let i = 0; i < entries.length; i++) {
+      const [name, score] = entries[i];
+      document.getElementById('scoreboard-table').innerHTML += `
+        <tr>
+          <td>${i + 1}</td>
+          <td>${name}</td>
+          <td>${score}</td>
+        </tr>`;
+    }
+  } else {
+    console.log("No such document!");
+  }
+}
+
   window.createGame=createGame;
   window.choose=choose;
   window.joinGame=joinGame;
@@ -355,3 +419,6 @@ function isTableFull(){
   window.backBtn=backBtn;
   window.gotoHome=gotoHome;
   window.replay=replay;
+  window.openScoreBoard=openScoreBoard;
+
+
