@@ -15,12 +15,12 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
 onAuthStateChanged(auth, (user) => {
-    if (user || localStorage.getItem("MKA-Email")) {
+    if (user) {
         console.log("Authentified Succesfully!");
     } else {
       console.log("Redirecting to authentication page.....")
-    //   document.getElementById('body').style.display='none'
-    //   window.location.href='https://mkumail14.github.io/authentication/'
+    localStorage.setItem('pendingSite', window.location.href)
+      window.location.href='https://mkumail14.github.io/authentication/'
 
           }
 });

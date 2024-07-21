@@ -323,7 +323,7 @@ async function setWinner(winner){
         winner:winner
       });
       let score=0;
-      let email=localStorage.getItem("email").split('')
+      let email=localStorage.getItem("MKA-Email").split('')
       let username=[];
       console.log(email)
       for(let i=0;i<100;i++){
