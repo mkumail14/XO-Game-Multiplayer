@@ -1,6 +1,6 @@
 
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-  import { getFirestore,collection, addDoc,doc, getDoc ,updateDoc} from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+  import { getFirestore,collection, addDoc,doc, getDoc ,updateDoc ,deleteDoc} from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyDdPmw7EHBU-AwoDQ1szeW7WtHANaF30Q0",
@@ -260,7 +260,10 @@ async function checkWin(){
     }
 }
 
-function gotoHome(){
+async function gotoHome(){
+  if(localStorage.getItem('icon')=="X"){
+    await deleteDoc(doc(db, "currentGame", localStorage.getItem('gameID')));
+  }
     localStorage.clear;
     window.location.href="index.html"
 }
