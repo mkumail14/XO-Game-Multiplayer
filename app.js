@@ -55,6 +55,12 @@ const docRef = await addDoc(collection(db, "currentGame"), {
   localStorage.setItem('icon',"X")
   document.getElementById('gameContainer').style.display='flex'
   document.getElementById('btnContainer').style.display='none'
+  await Swal.fire({
+    title: "Game Created!",
+    text: "Game code has been copied to your clipboard",
+    icon: "success"
+  });
+
   }
 
   async function loadData(){

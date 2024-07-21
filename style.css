@@ -143,4 +143,7 @@ button:hover {
         margin: 5px;
         font-size: 0.9em;
     }
+    h5{
+        font-size: medium;
+    }
 }
