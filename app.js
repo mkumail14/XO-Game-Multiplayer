@@ -48,6 +48,7 @@ const docRef = await addDoc(collection(db, "currentGame"), {
     status:"Disconnected",
     turn:`${turn}`,
     winner:null,
+    replay:false
   });
   navigator.clipboard.writeText(docRef.id);
   localStorage.setItem('gameID',docRef.id)
@@ -59,9 +60,21 @@ const docRef = await addDoc(collection(db, "currentGame"), {
   async function loadData(){
     const docRef = doc(db, "currentGame", localStorage.getItem('gameID'));
     const docSnap = await getDoc(docRef);
-    
     if (docSnap.exists()) {
-      if(docSnap.data().winner==null){
+      console.log(docSnap.data())
+      if(isTableFull()){
+        Stop=true;
+        await Swal.fire({
+          title: "Oops!",
+          text: "Match Draw!",
+          icon: "warning"
+        });
+        if(localStorage.getItem('icon')=='O'){
+          document.getElementById('replayBtn').classList.add('disabled')
+        }
+          document.getElementById('replayBtn').style.display='inline'
+          document.getElementById('homeBtn').style.display='inline'
+      }else if(docSnap.data().winner==null){
         checkWin()
       }else{
         Stop=true;
@@ -78,6 +91,9 @@ const docRef = await addDoc(collection(db, "currentGame"), {
                 icon: "error"
               });
         }
+        if(localStorage.getItem('icon')=='O'){
+            document.getElementById('replayBtn').classList.add('disabled')
+          }
           document.getElementById('replayBtn').style.display='inline'
           document.getElementById('homeBtn').style.display='inline'
       }
@@ -154,6 +170,7 @@ const docRef = await addDoc(collection(db, "currentGame"), {
     setInterval(function () {
         if(localStorage.getItem('gameID') && Stop==false){
         loadData()}
+        checkReplay();
       }, 1000);
  
  async function choose(cellId){
@@ -248,30 +265,50 @@ function gotoHome(){
     window.location.href="index.html"
 }
 
-// async function replay(){
-//     const temp = doc(db, "currentGame", localStorage.getItem('gameID'));
-//     let turn;
-//     let tempValue=Math.random()*100;
-//     if(tempValue>50){
-//     turn="X"
-//     }else{
-//     turn="O"
-//     }
-//     await updateDoc(temp, {
-//         cell0:null,
-//         cell1:null,
-//         cell2:null,
-//         cell3:null,
-//         cell4:null,
-//         cell5:null,
-//         cell6:null,
-//         cell7:null,
-//         cell8:null,
-//         status:"Disconnected",
-//         turn:`${turn}`,
-//         winner:null
-//       });
-// }
+async function replay(){
+    Stop=false;
+    for(let i=0;i<9;i++){
+      document.getElementById(`${i}`).innerText=''
+      document.getElementById(`${i}`).classList.remove('disabled')
+    }
+    if(localStorage.getItem('icon')=="X"){
+        const temp = doc(db, "currentGame", localStorage.getItem('gameID'));
+        let turn;
+        let tempValue=Math.random()*100;
+        if(tempValue>50){
+        turn="X"
+        }else{
+        turn="O"
+        }
+        await updateDoc(temp, {
+            cell0:null,
+            cell1:null,
+            cell2:null,
+            cell3:null,
+            cell4:null,
+            cell5:null,
+            cell6:null,
+            cell7:null,
+            cell8:null,
+            status:"Disconnected",
+            turn:`${turn}`,
+            winner:null,
+            replay:true
+          });
+          document.getElementById('homeBtn').style.display='none'
+        document.getElementById('replayBtn').style.display='none'
+     
+    }else if(localStorage.getItem('icon')=="O"){
+            const temp = doc(db, "currentGame", localStorage.getItem('gameID'));
+        await updateDoc(temp, {
+            status:"connected",
+            replay:false
+          });
+        document.getElementById('homeBtn').style.display='none'
+        document.getElementById('replayBtn').style.display='none'
+    }
+ 
+}
 
 async function setWinner(winner){
     const temp = doc(db, "currentGame", localStorage.getItem('gameID'));
@@ -279,9 +316,33 @@ async function setWinner(winner){
         winner:winner
       });
 }
+
+
+async function checkReplay(){
+    if(localStorage.getItem('gameID')){
+    const docRef = doc(db, "currentGame", localStorage.getItem('gameID'));
+    const docSnap = await getDoc(docRef);
+    if(localStorage.getItem('icon')=="O" && docSnap.data().replay==true){
+        document.getElementById('replayBtn').classList.remove('disabled')
+    }
+}
+    
+}
+
+function isTableFull(){
+  for(let i=0;i<9;i++){
+    if(document.getElementById(`${i}`).innerText==''){
+      return false;
+      break
+    }
+  }
+  return true;
+}
+
   window.createGame=createGame;
   window.choose=choose;
   window.joinGame=joinGame;
   window.submitGameId=submitGameId;
   window.backBtn=backBtn;
   window.gotoHome=gotoHome;
+  window.replay=replay;
