@@ -336,14 +336,19 @@ async function setWinner(winner){
       username=username.join('')
       const docRef = doc(db, "scoreboard","scoreboard" );
       const docSnap = await getDoc(docRef);
-      score=docSnap.data()[username]
-      console.log(username)
-      console.log(score)
+      if(docSnap.data()[username]){
+        score=docSnap.data()[username]
+        console.log(username)
+        console.log(score)
+      }else{
+        score=0;
+      }
+      
       score+=5
       
       const temp1 = doc(db, "scoreboard","scoreboard");
       await updateDoc(temp1, {
-        abc:score
+        [username]:score
       });
 }
 
@@ -420,5 +425,6 @@ async function loadStockBoard() {
   window.gotoHome=gotoHome;
   window.replay=replay;
   window.openScoreBoard=openScoreBoard;
+
 
 
