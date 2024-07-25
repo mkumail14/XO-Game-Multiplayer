@@ -19,7 +19,7 @@ onAuthStateChanged(auth, (user) => {
         console.log("Authentified Succesfully!");
     } else {
       console.log("Redirecting to authentication page.....")
-    localStorage.setItem('pendingSite', window.location.href)
+        localStorage.setItem('pendingSite', window.location.href)
       window.location.href='https://mkumail14.github.io/authentication/'
 
           }

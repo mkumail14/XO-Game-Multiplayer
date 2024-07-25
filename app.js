@@ -416,7 +416,6 @@ async function loadStockBoard() {
     console.log("No such document!");
   }
 }
-
   window.createGame=createGame;
   window.choose=choose;
   window.joinGame=joinGame;
